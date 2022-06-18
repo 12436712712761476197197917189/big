@@ -1,0 +1,604 @@
+local Framework = loadstring(game:HttpGet("https://pastebinp.com/raw/KP1dUHFg"))()
+local Watermark = Framework:CreateWatermark("DOX | {game} | {fps}")
+local WriteLine = Framework:CreateWindow("BIG PAINTBALL", Vector2.new(492, 588), Enum.KeyCode.RightControl)
+
+local mt = getrawmetatable(game)
+setreadonly(mt,false)
+local indexBackup = mt.__index
+mt.__index = function(a,b)
+   if b == "Position" and a.Parent == game.Players.LocalPlayer.Character then
+       return nil
+   end
+   return indexBackup(a,b)
+end
+
+local General = WriteLine:CreateTab("Main")
+local Config = WriteLine:CreateTab("Config")
+
+local Main = General:CreateSector("Player", "left")
+local Main1 = General:CreateSector("Combat", "right")
+local Main2 = General:CreateSector("Visual ", "right")
+Config:CreateConfigSystem("left")
+
+local ESPSettings  = { PlayerESP = { Enabled = false, TracersOn = false, BoxesOn = false, NamesOn = false, DistanceOn = false, HealthOn = false, ToolOn = false, FaceCamOn = false, Distance = 2000 }, ScrapESP = { Enabled = false, Distance = 2000, LegendaryOnly = true, RareOnly = true, GoodOnly = true, BadOnly = true }, SafeESP = { Enabled = false, Distance = 2000, BigOnly = true, SmallOnly = true }, RegisterESP = { Enabled = false, Distance = 2000 }, ESPColor = Color3.fromRGB(255, 255, 255), ToolColor = Color3.fromRGB(255, 255, 255)};
+local ESPFramework = loadstring(game:HttpGet("https://raw.githubusercontent.com/NougatBitz/Femware-Leak/main/ESP.lua", true))()
+
+require(game.ReplicatedStorage:WaitForChild("Framework"):WaitForChild("Library")).Signal.Fire("New Item", "Message", "Bracket Loaded!")
+
+Main:AddSeperator("Speed")
+
+local WALKSPEED = Main:AddToggle("Enable Walkspeed", false, function(v)
+if v == true then
+    getgenv().WalkSpeedValue = _G.WalkSpeed; 
+    local Player = game:service'Players'.LocalPlayer;
+    Player.Character.Humanoid:GetPropertyChangedSignal'WalkSpeed':Connect(function()
+    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue;
+    end)
+    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue;
+    end 
+    if v == false then
+    getgenv().WalkSpeedValue = 16; 
+    local Player = game:service'Players'.LocalPlayer;
+    Player.Character.Humanoid:GetPropertyChangedSignal'WalkSpeed':Connect(function()
+    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue;
+    end)
+    Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue;
+end
+end)
+WALKSPEED:AddKeybind("None", "UserIToggle")
+
+Main:AddSlider("Walkspeed", 5, 5, 100, 1, function(v)
+_G.WalkSpeed = v
+end)
+
+local JUMPPOWER = Main:AddToggle("Enable Jump Power", false, function(v)
+if v == true then
+    getgenv().JumpPowerValue = _G.JumpPower; 
+    local Player = game:service'Players'.LocalPlayer;
+    Player.Character.Humanoid:GetPropertyChangedSignal'WalkSpeed':Connect(function()
+    Player.Character.Humanoid.JumpPower = getgenv().JumpPowerValue;
+    end)
+    Player.Character.Humanoid.JumpPower = getgenv().JumpPowerValue;
+    end 
+    if v == false then
+    getgenv().JumpPowerValue = 50; 
+    local Player = game:service'Players'.LocalPlayer;
+    Player.Character.Humanoid:GetPropertyChangedSignal'JumpPower':Connect(function()
+    Player.Character.Humanoid.JumpPower = getgenv().JumpPowerValue;
+    end)
+    Player.Character.Humanoid.JumpPower = getgenv().JumpPowerValue;
+end
+end)
+
+JUMPPOWER:AddKeybind("None", "UserIToggle")
+
+Main:AddSlider("Jump Power", 5, 5, 100, 1, function(v)
+_G.JumpPower = v
+end)
+
+Main:AddSeperator("Others")
+
+Main:AddButton("Fly [X]", function()
+    local Flying = true
+    local Flymode = "Camera"
+    local MaxSpeed = 10 -- speed 
+    local Down = {['w'] = false, ['a'] = false, ['s'] = false, ['d'] = false, ['q'] = false, ['e'] = false}
+    local KD = game.Players.LocalPlayer:GetMouse().KeyDown
+    local KU = game.Players.LocalPlayer:GetMouse().KeyUp
+    KD:Connect(function(K)
+        if K == "w" or K == "a" or K == "s" or K == "d" or K == "q" or K == "e" then 
+            Down[K] = true 
+            print(Down[K])
+        end
+    end)
+    
+    KU:Connect(function(K)
+        if K == "w" or K == "a" or K == "s" or K == "d" or K == "q" or K == "e" then 
+            Down[K] = false 
+        elseif K == "x" then 
+            Flying = not Flying 
+            EnableFly()
+        end
+    end)
+    
+    if workspace:FindFirstChild("CenterOfGravitationalForce") then 
+        Flying = false 
+        workspace:FindFirstChild("CenterOfGravitationalForce"):Destroy()
+    end
+    
+    local Flyanimation = Instance.new('Animation', game.Workspace)
+    Flyanimation.AnimationId = 'rbxassetid://3541044388'
+    local Idleanimation = Instance.new('Animation', game.Workspace)
+    Idleanimation.AnimationId = 'rbxassetid://3541114300'
+    local HeroIdle = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Idleanimation)
+    local HeroFly = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Flyanimation)
+    
+    local Inc = 0.1
+    
+    function EnableFly()
+        local Speed = 0.5
+        local Part = Instance.new("Part")
+        Part.Parent = workspace
+        Part.Size = Vector3.new(5,5,5)
+        Part.Transparency = 1
+        Part.CanCollide = false 
+        Part.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        Part.Anchored = true
+        Part.Name = "CenterOfGravitationalForce"
+        
+        local Att1 = Instance.new("Attachment")
+        Att1.Name = "Att1"
+        Att1.Visible = false 
+        Att1.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+        
+        local Att2 = Instance.new("Attachment")
+        Att2.Name = "Att2"
+        Att2.Visible = false 
+        Att2.Parent = Part
+        
+        local AlignPos = Instance.new("AlignPosition")
+        local AlignGyro = Instance.new("AlignOrientation")
+        
+        AlignPos.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+        AlignPos.Attachment0 = Att1
+        AlignPos.MaxForce = math.huge
+        AlignPos.MaxVelocity = math.huge
+        AlignPos.Mode = Enum.PositionAlignmentMode.TwoAttachment
+        AlignPos.Attachment1 = Att2
+        AlignPos.RigidityEnabled = false 
+        
+        AlignGyro.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+        AlignGyro.Mode = Enum.OrientationAlignmentMode.OneAttachment
+        AlignGyro.CFrame = workspace.CurrentCamera.CFrame
+        AlignGyro.MaxTorque = math.huge
+        AlignGyro.Attachment0 = Att1
+        AlignGyro.RigidityEnabled = false
+        
+        repeat wait() 
+            game.Players.LocalPlayer.Character.Humanoid.PlatformStand = true
+            if Down["w"] then 
+                HeroFly:Play()
+                HeroIdle:Stop()
+                Part.CFrame = Part.CFrame + workspace.CurrentCamera.CFrame.lookVector * Speed
+                Speed = Speed + Inc
+            end
+            if Down["s"] then 
+                HeroFly:Play()
+                HeroIdle:Stop()
+                Part.CFrame = Part.CFrame - workspace.CurrentCamera.CFrame.lookVector * Speed
+                Speed = Speed + Inc
+            end
+            if Down["q"] then 
+                Part.CFrame = Part.CFrame * CFrame.new(0, Speed, 0)
+            end 
+            if Down["e"] then 
+                Part.CFrame = Part.CFrame * CFrame.new(0, -Speed, 0)
+            end
+            if Speed > MaxSpeed then 
+                Speed = MaxSpeed
+            end
+            if not Down["w"] and not Down["s"] then 
+                HeroFly:Stop()
+                HeroIdle:Play()
+            end
+            if Down["w"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad(Speed*4), 0 ,0)
+            elseif Down["s"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(math.rad(Speed*4), 0 ,0)
+            elseif Down["q"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(math.rad(Speed*7), 0 ,0)
+            elseif Down["e"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad(Speed*7), 0 ,0)
+            elseif Down["a"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(0, math.rad(Speed*50) ,0)
+            elseif Down["d"] then 
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(0, -math.rad(Speed*50) ,0)
+            else
+                AlignGyro.CFrame = workspace.CurrentCamera.CFrame
+            end
+        until Flying == false
+        game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
+        AlignGyro:Destroy()
+        AlignPos:Destroy()
+        Part:Destroy()
+        HeroIdle:Stop()
+        HeroFly:Stop()
+    end
+    EnableFly()
+end)
+
+Main:AddButton("Float [Q & E]", function()
+bruh = Instance.new('Part', game.Workspace)
+bruh.Name = "bruh"
+bruh.Size = Vector3.new(6,.1,6)
+bruh.Color = Color3.fromRGB(100,166,200)
+bruh.Anchored = true
+bruh.Transparency = 1 --set to whatever lol
+loop = false
+a = game.Players.LocalPlayer:GetMouse()
+a.KeyDown:Connect(function(black)
+if black == "q" then
+   loop = true
+   while loop do
+       wait()
+bruh.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,-3.05,0)
+end
+elseif black == "e" and loop == true then
+loop = false
+end
+end)
+end)
+
+Main:AddToggle("Infinite Jump", false,function(v)
+    if v == true then
+        local Player = game:GetService'Players'.LocalPlayer;
+    local UIS = game:GetService'UserInputService';
+     
+    _G.JumpHeight = 50;
+     
+    function Action(Object, Function) if Object ~= nil then Function(Object); end end
+     
+    UIS.InputBegan:connect(function(UserInput)
+        if UserInput.UserInputType == Enum.UserInputType.Keyboard and UserInput.KeyCode == Enum.KeyCode.Space then
+            Action(Player.Character.Humanoid, function(self)
+                if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
+                    Action(self.Parent.HumanoidRootPart, function(self)
+                        self.Velocity = Vector3.new(0, _G.JumpHeight, 0);
+                    end)
+                end
+            end)
+        end
+    end)
+    end
+      if v == false then
+        local Player = game:GetService'Players'.LocalPlayer;
+    local UIS = game:GetService'UserInputService';
+     
+    _G.JumpHeight = 0;
+     
+    function Action(Object, Function) if Object ~= nil then Function(Object); end end
+     
+    UIS.InputBegan:connect(function(UserInput)
+        if UserInput.UserInputType == Enum.UserInputType.Keyboard and UserInput.KeyCode == Enum.KeyCode.Space then
+            Action(Player.Character.Humanoid, function(self)
+                if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
+                    Action(self.Parent.HumanoidRootPart, function(self)
+                        self.Velocity = Vector3.new(0, _G.JumpHeight, 0);
+                    end)
+                end
+            end)
+        end
+    end)
+    end
+end)
+
+
+
+
+Main:AddToggle("Ctrl + Click to tp", false, function(v)
+    local speed = 100 -- set this lower to make it slower
+    local bodyvelocityenabled = true -- set this to false if you are getting kicked
+    
+    local Imput = game:GetService("UserInputService")
+    local Plr = game.Players.LocalPlayer
+    local Mouse = Plr:GetMouse()
+    
+    function To(position)
+    local Chr = Plr.Character
+    if Chr ~= nil then
+    local ts = game:GetService("TweenService")
+    local char = game.Players.LocalPlayer.Character
+    local hm = char.HumanoidRootPart
+    local dist = (hm.Position - Mouse.Hit.p).magnitude
+    local tweenspeed = dist/tonumber(speed)
+    local ti = TweenInfo.new(tonumber(tweenspeed), Enum.EasingStyle.Linear)
+    local tp = {CFrame = CFrame.new(position)}
+    ts:Create(hm, ti, tp):Play()
+    if bodyvelocityenabled == true then
+    local bv = Instance.new("BodyVelocity")
+    bv.Parent = hm
+    bv.MaxForce = Vector3.new(100000,100000,100000)
+    bv.Velocity = Vector3.new(0,0,0)
+    wait(tonumber(tweenspeed))
+    bv:Destroy()
+    end
+    end
+    end
+    
+    Imput.InputBegan:Connect(function(input)
+       if input.UserInputType == Enum.UserInputType.MouseButton1 and Imput:IsKeyDown(Enum.KeyCode.LeftControl) then
+           To(Mouse.Hit.p)
+       end
+      end)
+end)
+
+Main:AddSeperator("Noclip")
+
+Main:AddToggle("Noclip", false, function(v)
+_G.Noclip = v
+        
+local function Noclip()
+if game.Players.LocalPlayer.Character ~= nil and _G.Noclip == true then
+for _, selfChar in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+    if selfChar:IsA("BasePart") and selfChar.CanCollide == true and selfChar.Name then
+            selfChar.CanCollide = false
+        end
+    end
+end
+end
+
+game:GetService('RunService').Stepped:Connect(Noclip)
+end)
+
+Main1:AddSeperator("Gun Mods")
+
+
+Main1:AddButton("Ultimate Gun >:)", function()
+    local checks={ "Ammo", "ammo", "Damage", "damage", "Firerate", "firerate", "FireRate", "fireRate", "Recoil", "recoil", "Spread", "spread", "ability", "Ability" }
+    for i,v in pairs(getgc(true))do
+       for x=1,#checks do
+           if type(v)=="table" and rawget(v,checks[x]) then
+               v.firerate=0
+               v.burstDelay=0
+               v.automatic=true
+               v.LoadedAmmo=math.huge
+               v.velocity=1000000
+               v.description="hot script by Jas_n#0501 ;)"
+               v.zoomAmount=5
+               v.additionalSpeed=11.5
+           end
+       end
+    end
+end)
+
+Main1:AddButton("Unlock all guns", function()
+    local library = require(game:GetService("ReplicatedStorage").Framework.Library) --> the framework 
+
+    local env = getsenv(game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["First Person Controller"])
+
+    local unlock_all = true --> This is the toggle to define if guns are unlocked or not
+
+--// Gun Bypass --> Bypasses the gun spawn
+local old_fire = library.Network.Fire
+library.Network.Fire = newcclosure(function(self, ...)
+   local args = {...}
+
+   if unlock_all and tostring(self) == "Request Respawn" then
+       args[1] = "1"
+   end
+
+   return old_fire(self, unpack(args))
+end)
+
+local old_own = env.DoesOwnGun
+env.DoesOwnGun = function(...)
+   return (unlock_all and true) or old_own(...)
+end
+--
+
+--// Unlock All --> Unlocks all which are onsale meaning with coins
+local old_own_gun = library.GunCmds.DoesOwnGun
+library.GunCmds.DoesOwnGun = newcclosure(function(self, ...)
+   return (unlock_all and true) or old_own_gun(self, ...)
+end)
+--
+
+--// Unlock Offsale --> Unlocks offsale things like limited time items.
+for _, gun in next, library.Directory.Guns do
+   gun["offsale"] = false
+   end
+end)
+
+Main1:AddToggle("Auto mode", false, function(v)
+    for i,v in pairs(game:GetService("ReplicatedStorage").Framework.Modules["1 | Directory"].Guns:GetChildren()) do
+        pcall(function()
+      require(v)[tostring(i)].automatic = v
+      print(i)
+        end)
+    end
+end)
+
+Main1:AddToggle("No bullet drop", false, function(v)
+    for i,v in pairs(game:GetService("ReplicatedStorage").Framework.Modules["1 | Directory"].Guns:GetChildren()) do
+        pcall(function()
+        require(v)[tostring(i)].velocity = 999999
+      print(i)
+    end)
+  end
+end)
+
+Main1:AddToggle("Add on speed", false, function(v)
+    local checks={ "Ammo", "ammo", "Damage", "damage", "Firerate", "firerate", "FireRate", "fireRate", "Recoil", "recoil", "Spread", "spread", "ability", "Ability" }
+    for i,v in pairs(getgc(true))do
+       for x=1,#checks do
+           if type(v)=="table" and rawget(v,checks[x]) then
+               v.additionalSpeed=11.5
+           end
+       end
+    end
+end)
+
+Main1:AddSeperator("Aimbot / Aimlock")
+
+Main1:AddButton("Aimlock", function()
+local Area = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local MyCharacter = LocalPlayer.Character
+local MyRoot = MyCharacter:FindFirstChild("Head")
+local MyHumanoid = MyCharacter:FindFirstChild("Humanoid")
+local Mouse = LocalPlayer:GetMouse()
+local MyView = Area.CurrentCamera
+local MyTeamColor = LocalPlayer.TeamColor
+local HoldingM2 = false
+local Active = false
+local Lock = false
+local Epitaph = 0.1 ---Note: The Bigger The Number, The More Prediction.
+local HeadOffset = Vector3.new(0, .1, 0)
+
+_G.TeamCheck = false
+_G.AimPart = "Head"
+_G.Sensitivity = 0
+_G.CircleSides = 64
+_G.CircleColor = Color3.fromRGB(255, 0, 130)
+_G.CircleTransparency = 100
+_G.CircleRadius = 200
+_G.CircleFilled = false
+_G.CircleVisible = true
+_G.CircleThickness = 1
+
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Position = Vector2.new(MyView.ViewportSize.X / 2, MyView.ViewportSize.Y / 2)
+FOVCircle.Radius = _G.CircleRadius
+FOVCircle.Filled = _G.CircleFilled
+FOVCircle.Color = _G.CircleColor
+FOVCircle.Visible = _G.CircleVisible
+FOVCircle.Transparency = _G.CircleTransparency
+FOVCircle.NumSides = _G.CircleSides
+FOVCircle.Thickness = _G.CircleThickness
+
+local function CursorLock()
+    UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
+end
+local function UnLockCursor()
+    HoldingM2 = false Active = false Lock = false 
+    UIS.MouseBehavior = Enum.MouseBehavior.Default
+end
+function FindNearestPlayer()
+    local dist = math.huge
+    local Target = nil
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v.Character:FindFirstChild("HumanoidRootPart") and v then
+            local TheirCharacter = v.Character
+            local CharacterRoot, Visible = MyView:WorldToViewportPoint(TheirCharacter[_G.AimPart].Position)
+            if Visible then
+                local RealMag = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(CharacterRoot.X, CharacterRoot.Y)).Magnitude
+                if RealMag < dist and RealMag < FOVCircle.Radius then
+                    dist = RealMag
+                    Target = TheirCharacter
+                end
+            end
+        end
+    end
+    return Target
+end
+
+UIS.InputBegan:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+        HoldingM2 = true
+        Active = true
+        Lock = true
+        if Active then
+            local The_Enemy = FindNearestPlayer()
+            while HoldingM2 do task.wait(.000001)
+                if Lock and The_Enemy ~= nil then
+                    local Future = The_Enemy.HumanoidRootPart.CFrame + (The_Enemy.HumanoidRootPart.Velocity * Epitaph + HeadOffset)
+                    MyView.CFrame = CFrame.lookAt(MyView.CFrame.Position, Future.Position)
+                    CursorLock()
+                end
+            end
+        end
+    end
+end)
+UIS.InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+        UnLockCursor()
+    end
+ end)
+end)
+
+Main1:AddSeperator("Auto Farm")
+
+Main1:AddButton("Under Farm", function()
+    loadstring(game:HttpGet('https://pastebin.com/raw/DprK3RhH'))()
+end)
+
+Main1:AddButton("Over Farm", function()
+    getgenv().Enabled = true
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/WetCheezit/Releases/main/Big-Paintball/KillAll.lua"))()
+end)
+
+Main1:AddButton("Spawn Farm", function()
+    local LocalPlayer = game:GetService("Players").LocalPlayer
+    local Mouse = LocalPlayer:GetMouse()
+    local Camera = workspace.CurrentCamera
+    
+    local CanTargetPlayer = function(Player)
+    if Player.Character and Player.Character:FindFirstChild("Hitbox") and not Player.Character:FindFirstChildOfClass("Forcefield") then
+    if Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
+    if (workspace.__VARIABLES.RoundType.Value == "FFA" or workspace.__VARIABLES.RoundType.Value == "TDM" and LocalPlayer.Team ~= Player.Name) then
+    return true
+    end
+    end
+    end
+    return false
+    end
+    
+    while wait() do
+    if not LocalPlayer.PlayerGui.Menu.Enabled then
+    for i, plr in pairs(game.Players:GetPlayers()) do
+    if CanTargetPlayer(plr) then
+    LocalPlayer.Character:SetPrimaryPartCFrame(plr.Character.Hitbox.CFrame * CFrame.new(0,2,0))
+    mouse1click()
+    wait(0.1)
+    end
+    end
+    end
+    end
+end)
+
+Main1:AddSeperator("Misc")
+
+Main1:AddButton("Join Banned Lands", function()
+    game:GetService("TeleportService"):Teleport(4505939773, LocalPlayer)
+end)
+
+Main2:AddSeperator("ESP")
+
+Main2:AddToggle("Enable ESP", ESPSettings.PlayerESP.Enabled, function(v)
+    ESPSettings.PlayerESP.Enabled = v
+    
+    ESPFramework.Color = ESPSettings.ESPColor
+    ESPFramework.ToolColor = ESPSettings.ToolColor
+    ESPFramework.Tracers = ESPSettings.PlayerESP.TracersOn
+    ESPFramework.Names = ESPSettings.PlayerESP.NamesOn
+    ESPFramework.Health = ESPSettings.PlayerESP.HealthOn
+    ESPFramework.Distance = ESPSettings.PlayerESP.DistanceOn
+    ESPFramework.Tool = ESPSettings.PlayerESP.ToolOn
+    ESPFramework.Boxes = ESPSettings.PlayerESP.BoxesOn
+    ESPFramework.FaceCamera = ESPSettings.PlayerESP.FaceCamOn
+    ESPFramework:Toggle(ESPSettings.PlayerESP.Enabled)
+    end, "PlayerESPsToggle")
+    
+    Main2:AddToggle("Face Camera", ESPSettings.PlayerESP.FaceCamOn, function(v)
+    ESPSettings.PlayerESP.FaceCamOn = v
+    ESPFramework.FaceCamera = ESPSettings.PlayerESP.FaceCamOn
+    end)
+    
+    Main2:AddToggle("Box ESP", ESPSettings.PlayerESP.BoxesOn, function(v)
+    ESPSettings.PlayerESP.BoxesOn = v
+    ESPFramework.Boxes = ESPSettings.PlayerESP.BoxesOn
+    end)
+    
+    Main2:AddToggle("Tracers ESP", ESPSettings.PlayerESP.TracersOn, function(v)
+    ESPSettings.PlayerESP.TracersOn = v
+    ESPFramework.Tracers = ESPSettings.PlayerESP.TracersOn
+    end)
+    
+    Main2:AddToggle("Name ESP", ESPSettings.PlayerESP.NamesOn, function(v)
+    ESPSettings.PlayerESP.NamesOn = v
+    ESPFramework.Names = ESPSettings.PlayerESP.NamesOn
+    end)
+    
+    Main2:AddToggle("Health ESP", ESPSettings.PlayerESP.HealthOn, function(v)
+    ESPSettings.PlayerESP.HealthOn = v
+    ESPFramework.Health = ESPSettings.PlayerESP.HealthOn
+    end)
+      
+    Main2:AddToggle("Distance ESP", ESPSettings.PlayerESP.DistanceOn, function(v)
+    ESPSettings.PlayerESP.DistanceOn = v
+    ESPFramework.Distance = ESPSettings.PlayerESP.DistanceOn
+    end)
+
